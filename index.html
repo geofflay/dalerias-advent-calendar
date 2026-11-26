@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f233c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Daleria's Advent" />
+  <title>Daleria's Festive Fitness Advent Calendar</title>
+
+  <!-- Festive Mobile Home-Screen App Icon (Inline SVG Data URI) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23102642'/%3E%3Cpolygon points='50,14 22,52 38,52 18,80 82,80 62,52 78,52' fill='%23166534'/%3E%3Crect x='44' y='80' width='12' height='10' fill='%235c2d16'/%3E%3Cpolygon points='50,8 53,16 61,16 55,21 57,29 50,24 43,29 45,21 39,16 47,16' fill='%23facc15'/%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23102642'/%3E%3Cpolygon points='50,14 22,52 38,52 18,80 82,80 62,52 78,52' fill='%23166534'/%3E%3Crect x='44' y='80' width='12' height='10' fill='%235c2d16'/%3E%3Cpolygon points='50,8 53,16 61,16 55,21 57,29 50,24 43,29 45,21 39,16 47,16' fill='%23facc15'/%3E%3C/svg%3E" />
+
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(180deg, #091526 0%, #132c4a 45%, #1d4268 78%, #dceaf7 100%);
+      color: #f8fafc;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    .font-festive {
+      font-family: 'Cinzel Decorative', Georgia, serif;
+    }
+
+    .font-serif-book {
+      font-family: 'Lora', Georgia, serif;
+    }
+
+    /* Snow Canvas Overlay */
+    #snow-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 40;
+    }
+
+    /* Wooden Chalet Frame */
+    .chalet-frame {
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(32, 14, 6, 0.28) 0px,
+          rgba(32, 14, 6, 0.28) 2px,
+          transparent 2px,
+          transparent 36px
+        ),
+        linear-gradient(180deg, #4b2613 0%, #3a1c0d 50%, #2c1409 100%);
+      border: 4px solid #6b381b;
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.65),
+        inset 0 2px 12px rgba(255, 224, 178, 0.18),
+        inset 0 -6px 18px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Carved Wooden & Gold Title Plaque */
+    .title-plaque {
+      background: linear-gradient(180deg, #5e2f16 0%, #3d1d0c 100%);
+      border: 2px solid #d97706;
+      box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.5),
+        inset 0 1px 4px rgba(253, 224, 71, 0.45);
+    }
+
+    .gold-text-shadow {
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75), 0 0 18px rgba(251, 191, 36, 0.35);
+    }
+
+    /* Snow Cap on Roof & Ledges */
+    .snow-ledge {
+      background: linear-gradient(180deg, #ffffff 0%, #e2eef9 70%, #bfd6ec 100%);
+      box-shadow: 0 4px 10px rgba(8, 22, 40, 0.35);
+    }
+
+    /* 3D Door Perspective Container */
+    .door-slot {
+      perspective: 900px;
+      aspect-ratio: 1 / 1.12;
+      position: relative;
+    }
+
+    /* Inner Glowing Alcove Behind Door */
+    .door-alcove {
+      position: absolute;
+      inset: 2px;
+      border-radius: 0.65rem;
+      background: radial-gradient(circle at 50% 45%, #fef08a 0%, #f59e0b 55%, #9a3412 100%);
+      box-shadow: inset 0 0 16px rgba(120, 53, 15, 0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      cursor: pointer;
+    }
+
+    /* Hinged Wooden Shutter / Cottage Door */
+    .door-leaf {
+      position: absolute;
+      inset: 0;
+      border-radius: 0.7rem;
+      transform-origin: left center;
+      transition: transform 0.7s cubic-bezier(0.34, 1.35, 0.64, 1), filter 0.25s ease;
+      transform-style: preserve-3d;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #92400e;
+      box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.45),
+        inset 0 1px 2px rgba(255, 237, 213, 0.35),
+        inset 0 -3px 6px rgba(28, 12, 4, 0.65);
+    }
+
+    /* Alternate Traditional Cottage Door Finishes */
+    .door-style-wood {
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(25, 10, 3, 0.22) 0px,
+          rgba(25, 10, 3, 0.22) 1.5px,
+          transparent 1.5px,
+          transparent 14px
+        ),
+        linear-gradient(160deg, #7c3f1d 0%, #582a11 100%);
+    }
+
+    .door-style-berry {
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(25, 5, 10, 0.22) 0px,
+          rgba(25, 5, 10, 0.22) 1.5px,
+          transparent 1.5px,
+          transparent 14px
+        ),
+        linear-gradient(160deg, #881337 0%, #580b23 100%);
+      border-color: #b45309;
+    }
+
+    .door-style-pine {
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(5, 25, 12, 0.25) 0px,
+          rgba(5, 25, 12, 0.25) 1.5px,
+          transparent 1.5px,
+          transparent 14px
+        ),
+        linear-gradient(160deg, #166534 0%, #0d3f20 100%);
+      border-color: #b45309;
+    }
+
+    /* Recessed Window Mullion Frame inside Door */
+    .door-leaf::before {
+      content: '';
+      position: absolute;
+      inset: 5px;
+      border-radius: 0.45rem;
+      border: 1px dashed rgba(253, 224, 71, 0.38);
+      pointer-events: none;
+    }
+
+    /* Brass Doorknob */
+    .door-knob {
+      position: absolute;
+      right: 7px;
+      top: 52%;
+      width: 7px;
+      height: 7px;
+      border-radius: 9999px;
+      background: radial-gradient(circle at 30% 30%, #fef08a, #b45309);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Open Door State */
+    .door-slot.is-open .door-leaf {
+      transform: rotateY(-122deg);
+      pointer-events: none;
+    }
+
+    /* Today's Unlocked Highlight Pulse */
+    .door-slot.is-today:not(.is-open) .door-leaf {
+      box-shadow:
+        0 0 0 2px #fde047,
+        0 0 18px rgba(250, 204, 21, 0.75),
+        inset 0 1px 3px rgba(255, 255, 255, 0.5);
+      animation: gentlePulse 2.4s infinite ease-in-out;
+    }
+
+    @keyframes gentlePulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.16); }
+    }
+
+    /* Shake Animation for Locked Doors */
+    @keyframes doorShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-4px) rotate(-1.5deg); }
+      40% { transform: translateX(4px) rotate(1.5deg); }
+      60% { transform: translateX(-3px) rotate(-1deg); }
+      80% { transform: translateX(3px) rotate(1deg); }
+    }
+
+    .shake-locked {
+      animation: doorShake 0.38s ease-in-out;
+    }
+
+    /* Parchment Modal Card */
+    .parchment-card {
+      background:
+        radial-gradient(circle at top left, rgba(253, 230, 138, 0.35), transparent 50%),
+        linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
+      color: #29170b;
+      border: 3px solid #b45309;
+      box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.75),
+        inset 0 0 24px rgba(180, 83, 9, 0.16);
+    }
+
+    /* Custom Scrollbar for Modal if Needed */
+    .parchment-card::-webkit-scrollbar {
+      width: 6px;
+    }
+    .parchment-card::-webkit-scrollbar-thumb {
+      background: #b45309;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-between py-3 px-2 sm:px-4">
+
+  <!-- Animated Falling Snow Canvas -->
+  <canvas id="snow-canvas"></canvas>
+
+  <!-- Main Illustrated Winter Village Container -->
+  <div class="relative z-10 w-full max-w-2xl mx-auto flex flex-col items-center">
+
+    <!-- Top Control Bar (Progress + Snow/Sound Toggles) -->
+    <div class="w-full flex items-center justify-between gap-2 mb-2 px-1">
+      <div class="flex items-center gap-1.5 bg-slate-900/75 backdrop-blur-sm border border-amber-400/40 rounded-full px-3 py-1 text-xs sm:text-sm font-semibold text-amber-200 shadow">
+        <span>⭐</span>
+        <span id="progress-label">0 / 24 Completed</span>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button id="toggle-snow-btn" type="button" aria-label="Toggle Snow"
+          class="bg-slate-900/75 hover:bg-slate-800 active:scale-95 transition border border-sky-300/30 rounded-full px-2.5 py-1 text-xs font-medium text-sky-100 shadow flex items-center gap-1">
+          <span>❄️</span>
+          <span id="snow-status-text">Snow On</span>
+        </button>
+        <button id="toggle-sound-btn" type="button" aria-label="Toggle Carol of the Bells Music & Chimes"
+          class="bg-slate-900/75 hover:bg-slate-800 active:scale-95 transition border border-amber-300/30 rounded-full px-2.5 py-1 text-xs font-medium text-amber-100 shadow flex items-center gap-1">
+          <span id="sound-icon">🎵</span>
+          <span id="sound-status-text">Music On</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Illustrated Snowy Village Rooftop & Header Banner -->
+    <div class="w-full relative">
+      <!-- SVG Winter Village Skyline, Pine Trees, Moon & Snowy Roof Peaks -->
+      <svg viewBox="0 0 800 175" class="w-full h-auto block drop-shadow-lg" aria-hidden="true">
+        <defs>
+          <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fef9c3" stop-opacity="0.95" />
+            <stop offset="55%" stop-color="#fde047" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#fde047" stop-opacity="0" />
+          </radialGradient>
+          <linearGradient id="roofWood" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#5c2d16" />
+            <stop offset="100%" stop-color="#38190b" />
+          </linearGradient>
+        </defs>
+
+        <!-- Glowing Full Winter Moon & Twinkling Stars -->
+        <circle cx="695" cy="46" r="56" fill="url(#moonGlow)" />
+        <circle cx="695" cy="46" r="22" fill="#fef08a" />
+        <circle cx="95" cy="30" r="2.2" fill="#fef08a" opacity="0.85" />
+        <circle cx="195" cy="18" r="1.8" fill="#ffffff" opacity="0.75" />
+        <circle cx="340" cy="24" r="2" fill="#fef08a" opacity="0.8" />
+        <circle cx="520" cy="16" r="2.3" fill="#ffffff" opacity="0.85" />
+        <circle cx="615" cy="32" r="1.7" fill="#fef08a" opacity="0.7" />
+
+        <!-- Background Snowy Hills -->
+        <path d="M0,150 Q160,105 340,145 T800,130 L800,175 L0,175 Z" fill="#1e3a5f" opacity="0.7" />
+
+        <!-- Left Snowy Pine Trees -->
+        <g transform="translate(36, 48)">
+          <polygon points="34,0 8,42 22,42 2,76 66,76 46,42 60,42" fill="#0f3d24" />
+          <polygon points="34,0 16,28 26,28 14,48 54,48 42,28 52,28" fill="#e2eef9" opacity="0.85" />
+          <rect x="29" y="76" width="10" height="16" fill="#3b1e10" />
+        </g>
+        <g transform="translate(88, 66) scale(0.8)">
+          <polygon points="34,0 8,42 22,42 2,76 66,76 46,42 60,42" fill="#14532d" />
+          <polygon points="34,0 18,24 27,24 16,42 52,42 41,24 50,24" fill="#f1f5f9" opacity="0.9" />
+          <rect x="29" y="76" width="10" height="16" fill="#3b1e10" />
+        </g>
+
+        <!-- Right Snowy Pine Trees -->
+        <g transform="translate(705, 52) scale(0.95)">
+          <polygon points="34,0 8,42 22,42 2,76 66,76 46,42 60,42" fill="#0f3d24" />
+          <polygon points="34,0 16,28 26,28 14,48 54,48 42,28 52,28" fill="#e2eef9" opacity="0.85" />
+          <rect x="29" y="76" width="10" height="16" fill="#3b1e10" />
+        </g>
+
+        <!-- Cozy Side Village Cottage Left -->
+        <g transform="translate(132, 82)">
+          <rect x="12" y="28" width="64" height="46" fill="#5c2d16" stroke="#2c1409" stroke-width="2" />
+          <polygon points="4,30 44,2 84,30" fill="#7f1d1d" />
+          <path d="M2,30 L44,0 L86,30" fill="none" stroke="#f8fafc" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+          <!-- Warm Glowing Cottage Window -->
+          <rect x="24" y="40" width="16" height="16" rx="2" fill="#fde047" stroke="#3b1e10" stroke-width="2" />
+          <line x1="32" y1="40" x2="32" y2="56" stroke="#3b1e10" stroke-width="1.5" />
+          <line x1="24" y1="48" x2="40" y2="48" stroke="#3b1e10" stroke-width="1.5" />
+          <!-- Chimney + Smoke -->
+          <rect x="58" y="6" width="10" height="16" fill="#475569" />
+          <circle cx="63" cy="-2" r="4" fill="#e2e8f0" opacity="0.6" />
+          <circle cx="68" cy="-9" r="5" fill="#e2e8f0" opacity="0.4" />
+        </g>
+
+        <!-- Cozy Side Village Cottage Right -->
+        <g transform="translate(592, 84)">
+          <rect x="12" y="26" width="62" height="44" fill="#4a2311" stroke="#2c1409" stroke-width="2" />
+          <polygon points="4,28 43,2 82,28" fill="#14532d" />
+          <path d="M2,28 L43,0 L84,28" fill="none" stroke="#f8fafc" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+          <rect x="44" y="38" width="16" height="16" rx="2" fill="#fde047" stroke="#3b1e10" stroke-width="2" />
+          <line x1="52" y1="38" x2="52" y2="54" stroke="#3b1e10" stroke-width="1.5" />
+          <line x1="44" y1="46" x2="60" y2="46" stroke="#3b1e10" stroke-width="1.5" />
+        </g>
+
+        <!-- Main Chalet Gable Roof Peak Behind Title -->
+        <polygon points="16,172 400,72 784,172" fill="url(#roofWood)" stroke="#291207" stroke-width="3" />
+        <!-- Thick Snowy Eaves on Main Chalet Roof -->
+        <path d="M10,172 Q205,120 400,70 Q595,120 790,172" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round" />
+        <path d="M10,174 Q205,122 400,72 Q595,122 790,174" fill="none" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round" />
+
+        <!-- Festive Pine Garland & Red Berries under Roof Peak -->
+        <path d="M180,136 Q290,158 400,136 Q510,158 620,136" fill="none" stroke="#15803d" stroke-width="7" stroke-linecap="round" />
+        <circle cx="240" cy="145" r="3.5" fill="#dc2626" />
+        <circle cx="290" cy="147" r="3.5" fill="#facc15" />
+        <circle cx="345" cy="144" r="3.5" fill="#dc2626" />
+        <circle cx="455" cy="144" r="3.5" fill="#dc2626" />
+        <circle cx="510" cy="147" r="3.5" fill="#facc15" />
+        <circle cx="560" cy="145" r="3.5" fill="#dc2626" />
+      </svg>
+
+      <!-- Carved Wooden Title Banner -->
+      <div class="title-plaque rounded-xl px-3 py-2.5 sm:px-6 sm:py-3 mx-1 -mt-3 relative z-20 text-center">
+        <div class="flex items-center justify-center gap-2 text-amber-300 text-[11px] sm:text-xs uppercase tracking-[0.2em] font-semibold mb-0.5">
+          <span>🎄</span>
+          <span id="calendar-date-status">December Countdown</span>
+          <span>🎄</span>
+        </div>
+        <h1 class="font-festive text-lg sm:text-2xl md:text-[26px] font-black text-amber-200 gold-text-shadow leading-tight">
+          Daleria's Festive Fitness Advent Calendar
+        </h1>
+      </div>
+    </div>
+
+    <!-- Main Wooden Advent Calendar Chalet Body with 24 Scrambled Doors -->
+    <main class="chalet-frame w-full rounded-b-2xl rounded-t-md p-2.5 sm:p-4 relative">
+      <!-- Decorative Snowy Ledge Trim -->
+      <div class="snow-ledge h-2.5 w-full rounded-full mb-3 opacity-95"></div>
+
+      <!-- 24 Scrambled Doors Grid: 4 columns x 6 rows on mobile, 6 columns x 4 rows on tablet/desktop -->
+      <div id="doors-grid" class="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3">
+        <!-- Doors injected dynamically via JavaScript -->
+      </div>
+
+      <!-- Snowy Ground Base & Village Lanterns -->
+      <div class="mt-3.5 pt-2 border-t border-amber-900/60 flex flex-wrap items-center justify-between gap-2 text-xs text-amber-100/90">
+        <p class="font-serif-book italic text-[12px] sm:text-sm">
+          Tap today's numbered shutter to reveal your daily festive workout!
+        </p>
+
+        <!-- Discreet Creator Preview Mode Toggle -->
+        <button id="preview-mode-btn" type="button"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/30 hover:bg-black/50 border border-amber-500/25 text-[11px] text-amber-200/75 hover:text-amber-200 transition"
+          title="Unlock all doors to preview exercises before December">
+          <span id="preview-icon">🔑</span>
+          <span id="preview-label">Preview Mode: Off</span>
+        </button>
+
+        <!-- Close Opened Doors After Previewing -->
+        <button id="close-doors-btn" type="button"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/30 hover:bg-black/50 border border-amber-500/25 text-[11px] text-amber-200/75 hover:text-amber-200 transition"
+          title="Swing all opened doors shut and reset preview progress">
+          <span>🚪</span>
+          <span>Close Doors</span>
+        </button>
+      </div>
+    </main>
+
+    <!-- Bottom Snowy Drift Footing -->
+    <div class="w-[102%] h-5 -mt-2 rounded-b-3xl bg-gradient-to-b from-white via-sky-100 to-sky-200 shadow-lg"></div>
+  </div>
+
+  <!-- Toast / Status Banner for Locked Doors or Feedback -->
+  <div id="toast-banner"
+    class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300 max-w-[92vw] sm:max-w-md">
+    <div class="bg-slate-900/95 border-2 border-amber-400 text-amber-100 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 text-sm font-medium">
+      <span id="toast-icon" class="text-lg">🔒</span>
+      <span id="toast-message">Patience! This door unlocks soon.</span>
+    </div>
+  </div>
+
+  <!-- Exercise Parchment Modal -->
+  <div id="exercise-modal"
+    class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-5 bg-slate-950/75 backdrop-blur-sm"
+    role="dialog" aria-modal="true" aria-labelledby="modal-exercise-title">
+    <div class="parchment-card w-full max-w-md rounded-2xl p-5 sm:p-6 relative max-h-[90dvh] overflow-y-auto transform transition-all">
+
+      <!-- Close Button -->
+      <button id="close-modal-btn" type="button" aria-label="Close workout card"
+        class="absolute top-3.5 right-3.5 w-9 h-9 rounded-full bg-amber-900/15 hover:bg-amber-900/25 text-amber-950 flex items-center justify-center text-lg font-bold transition">
+        ✕
+      </button>
+
+      <!-- Date Badge -->
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-900 text-amber-100 text-xs font-bold uppercase tracking-wider mb-2 shadow-sm">
+        <span>🎄</span>
+        <span id="modal-date-label">December 1</span>
+      </div>
+
+      <!-- Exercise Title -->
+      <h2 id="modal-exercise-title" class="font-festive text-xl sm:text-2xl font-black text-red-950 leading-snug pr-8">
+        Exercise Name
+      </h2>
+
+      <!-- Target Reps / Sets / Duration Pill -->
+      <div class="mt-3 p-3 rounded-xl bg-amber-900/10 border border-amber-800/25 flex items-center gap-3">
+        <span id="modal-exercise-icon" class="text-3xl">💪</span>
+        <div>
+          <div class="text-[11px] uppercase tracking-wider font-bold text-amber-900">Today's Target</div>
+          <div id="modal-exercise-reps" class="text-base sm:text-lg font-extrabold text-red-900">
+            3 Sets of 12 Reps
+          </div>
+        </div>
+      </div>
+
+      <!-- How-To Description -->
+      <div class="mt-4">
+        <h3 class="text-xs uppercase tracking-wider font-bold text-amber-900 mb-1">How to Perform</h3>
+        <p id="modal-exercise-desc" class="font-serif-book text-sm sm:text-base text-stone-800 leading-relaxed">
+          Exercise instructions go here.
+        </p>
+      </div>
+
+      <!-- Festive Coach Tip -->
+      <div class="mt-4 p-3 rounded-xl bg-emerald-900/10 border border-emerald-800/25 flex items-start gap-2.5">
+        <span class="text-lg leading-none mt-0.5">✨</span>
+        <p id="modal-exercise-tip" class="text-xs sm:text-sm text-emerald-950 font-medium leading-snug">
+          Festive encouragement tip!
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="mt-6 flex flex-col sm:flex-row gap-2.5">
+        <button id="mark-complete-btn" type="button"
+          class="flex-1 py-3 px-4 rounded-xl font-bold text-sm sm:text-base shadow-md transition active:scale-98 flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white">
+          <span id="complete-btn-icon">⭐</span>
+          <span id="complete-btn-text">Mark Complete</span>
+        </button>
+        <button id="modal-done-btn" type="button"
+          class="py-3 px-4 rounded-xl font-semibold text-sm bg-amber-900/15 hover:bg-amber-900/25 text-amber-950 transition">
+          Back to Village
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * =========================================================================
+     * DALERIA'S 24 BEGINNER AT-HOME FESTIVE EXERCISES (EASY TO EDIT!)
+     * Ordered gradually from gentle Day 1 warm-ups/mobility to slightly more
+     * challenging beginner reps, holds, and baked-bean-can moves by Day 24.
+     * =========================================================================
+     */
+    const EXERCISES = [
+      {
+        day: 1,
+        icon: "🧣",
+        title: "Fireside Cat-Cow Back Stretch",
+        reps: "1 Set of 8 Slow Breaths",
+        description: "Sit comfortably on a chair or rest on hands and knees on a soft rug. Gently lift your chest and look slightly up as you breathe in, then round your spine and tuck your chin as you breathe out, pausing briefly at each end.",
+        tip: "A great warm-up to wake up your spine—take a full breath in and out on each rep!"
+      },
+      {
+        day: 2,
+        icon: "🧦",
+        title: "Stocking-Reach Heel Raises",
+        reps: "2 Sets of 12 Reps",
+        description: "Stand behind a sturdy chair or kitchen counter with fingertips resting lightly for balance. Rise up onto the balls of your feet, pause for 1 second at the top, and slowly lower your heels.",
+        tip: "Try lifting your fingers slightly off the support if you feel steady!"
+      },
+      {
+        day: 3,
+        icon: "🎄",
+        title: "Twinkling Tree March in Place",
+        reps: "1 Set of 45 Seconds",
+        description: "March briskly on the spot at a steady, lively pace, lifting your knees up toward hip height and pumping your arms with purpose.",
+        tip: "Keep your torso upright and let your arms drive the rhythm."
+      },
+      {
+        day: 4,
+        icon: "🎀",
+        title: "Ribbon-Unwrap Chest Openers",
+        reps: "2 Sets of 10 Reps",
+        description: "Stand or sit tall with elbows tucked near your ribs and forearms out in front. Slowly sweep your arms outward and slightly back to open across your chest, squeezing your shoulder blades gently.",
+        tip: "Hold the open position for a moment on each rep to feel the stretch."
+      },
+      {
+        day: 5,
+        icon: "🪑",
+        title: "Sleigh-Seat Sit-to-Stands",
+        reps: "2 Sets of 8 Reps",
+        description: "Sit near the front edge of a sturdy dining chair with feet flat on the floor. Lean slightly forward, press firmly through your heels to stand up tall, and lower down slowly over 3 seconds.",
+        tip: "Hover just above the seat for a split second before sitting all the way down."
+      },
+      {
+        day: 6,
+        icon: "🔔",
+        title: "Jingle-Step Side Taps",
+        reps: "2 Sets of 40 Seconds",
+        description: "Step your right foot out to the side and tap your left toe beside it with an energetic arm swing, then step left and tap right at a brisk, low-impact pace.",
+        tip: "Stay light on your feet and keep the tempo moving!"
+      },
+      {
+        day: 7,
+        icon: "🥫",
+        title: "Baked Bean Can Bicep Curls",
+        reps: "2 Sets of 10 Reps",
+        description: "Hold one tin of baked beans in each hand with palms facing forward and elbows tucked firmly by your sides. Curl both tins up toward your shoulders and lower them slowly over 3 seconds.",
+        tip: "Keep your elbows pinned to your sides so your biceps do the work."
+      },
+      {
+        day: 8,
+        icon: "☕",
+        title: "Hot Cocoa Seated Knee Lifts",
+        reps: "2 Sets of 8 Reps per Leg",
+        description: "Sit tall toward the front of a sturdy chair holding the sides of the seat. Slowly lift one knee up toward your chest, pause for 1 second, lower with control, and switch legs.",
+        tip: "Engage your tummy gently and avoid leaning back as your knee rises."
+      },
+      {
+        day: 9,
+        icon: "🧱",
+        title: "Fireside Wall Push-Ups",
+        reps: "2 Sets of 8 Reps",
+        description: "Stand a full arm's length or slightly further from a clear wall with hands shoulder-width apart at chest height. Bend your elbows to lower your chest toward the wall, then press back smoothly.",
+        tip: "Step your feet back a few inches to make the angle a little tougher."
+      },
+      {
+        day: 10,
+        icon: "✨",
+        title: "Tinsel Arm Circles",
+        reps: "2 Sets of 10 Circles Each Way",
+        description: "Stand tall holding a baked bean tin in each hand with arms extended out to shoulder height. Draw smooth, controlled circles forward for 10 reps, then reverse backward for 10 reps without dropping your arms.",
+        tip: "Keep your shoulders down away from your ears throughout the set."
+      },
+      {
+        day: 11,
+        icon: "❄️",
+        title: "Kitchen-Counter Side Leg Lifts",
+        reps: "2 Sets of 10 Reps per Leg",
+        description: "Stand sideways next to a kitchen counter or chair back with one hand for balance. Keeping your leg straight and toes pointing forward, lift your outside leg out to the side and lower slowly.",
+        tip: "Pause at the top of each lift rather than letting the leg bounce."
+      },
+      {
+        day: 12,
+        icon: "🎁",
+        title: "Cozy Cushion Glute Bridges",
+        reps: "2 Sets of 10 Reps",
+        description: "Lie on your back on a rug or mat with knees bent, feet flat on the floor, and a cushion under your head. Squeeze your glutes to lift your hips high, pause for 2 seconds at the top, and lower slowly.",
+        tip: "Press through your heels and keep your ribs tucked gently down."
+      },
+      {
+        day: 13,
+        icon: "🥫",
+        title: "Gingerbread Hammer Curls",
+        reps: "2 Sets of 12 Reps",
+        description: "Hold a baked bean can in each hand with palms facing inward toward your body. Curl both tins smoothly up toward your shoulders and lower them over 3 seconds.",
+        tip: "Steady, controlled lowering makes a big difference for arm strength."
+      },
+      {
+        day: 14,
+        icon: "🥫",
+        title: "Snowflake Side Arm Raises",
+        reps: "2 Sets of 10 Reps",
+        description: "Stand tall holding a baked bean tin in each hand down by your sides. Slowly raise both arms out to the sides to shoulder height, pause for 1 second, and lower with control.",
+        tip: "Keep a slight soft bend in your elbows and lift smoothly."
+      },
+      {
+        day: 15,
+        icon: "🕯️",
+        title: "Candlelight Back Kickbacks",
+        reps: "2 Sets of 10 Reps per Leg",
+        description: "Hold onto a chair back or kitchen counter with both hands. Keeping your leg straight and glute squeezed, extend one leg back behind you, pause briefly, and return without touching down heavily.",
+        tip: "Keep your hips square to the floor so your glutes stay engaged."
+      },
+      {
+        day: 16,
+        icon: "🎄",
+        title: "Twinkling Tree High-Knee March",
+        reps: "2 Sets of 45 Seconds",
+        description: "March briskly on the spot for two rounds, lifting your knees higher toward hip level while swinging your opposite arm forward.",
+        tip: "Keep a steady breathing rhythm and take 30 seconds rest between rounds."
+      },
+      {
+        day: 17,
+        icon: "🥫",
+        title: "Sleigh-Pull Bent-Over Rows",
+        reps: "2 Sets of 10 Reps",
+        description: "Hold a baked bean can in each hand, soften your knees, and hinge forward at your hips with a flat back. Pull both tins up toward your lower ribs, squeezing your shoulder blades together for 1 second.",
+        tip: "Keep your neck neutral and look at the floor just ahead of your toes."
+      },
+      {
+        day: 18,
+        icon: "🌟",
+        title: "North Star Standing Bird-Dog",
+        reps: "2 Sets of 8 Reps per Side",
+        description: "Stand tall and reach your right arm forward while extending your left leg back behind you, holding steady for 1 second before returning to center. Switch sides and repeat.",
+        tip: "Rest just one fingertip on a chair or wall if you want a balance safety net."
+      },
+      {
+        day: 19,
+        icon: "🥫",
+        title: "Star-Topper Overhead Presses",
+        reps: "2 Sets of 10 Reps",
+        description: "Stand or sit tall holding a baked bean tin in each hand just above your shoulders. Press both tins straight up overhead without locking your elbows, then lower back down smoothly.",
+        tip: "Keep your core braced so your lower back doesn't arch as you press up."
+      },
+      {
+        day: 20,
+        icon: "⛄",
+        title: "Snowman Wall Sit",
+        reps: "2 Sets of 25 Seconds",
+        description: "Lean your back flat against a wall and walk your feet forward a step. Slide down into a comfortable squat position—going a little deeper than a mini-sit—and hold while breathing evenly.",
+        tip: "Keep your shins roughly vertical and push through your whole foot."
+      },
+      {
+        day: 21,
+        icon: "🍪",
+        title: "Sugarplum Sumo Squats",
+        reps: "2 Sets of 10 Reps",
+        description: "Stand wider than hip-width with toes turned slightly outward. Bend your knees and sit your hips back into a comfortable squat, then drive through your heels to stand back up.",
+        tip: "Keep your chest proud and knees tracking in the same direction as your toes."
+      },
+      {
+        day: 22,
+        icon: "🥫",
+        title: "Festive Can-Pass Around the Waist",
+        reps: "2 Sets of 10 Passes Each Way",
+        description: "Stand with feet hip-width apart holding one baked bean tin. Pass the tin smoothly from hand to hand around your waist 10 times clockwise, then 10 times counter-clockwise.",
+        tip: "Keep your hips still and let your waist and shoulders stay steady."
+      },
+      {
+        day: 23,
+        icon: "🦌",
+        title: "Reindeer Countertop Plank",
+        reps: "2 Sets of 30 Seconds",
+        description: "Place your hands shoulder-width apart on a sturdy kitchen counter or heavy table and step your feet back into a straight plank line. Hold steady with your core and glutes gently engaged.",
+        tip: "Don't let your hips sag or pike up—stay straight from head to heels."
+      },
+      {
+        day: 24,
+        icon: "🏆",
+        title: "Christmas Eve Victory Trio",
+        reps: "3 Rounds: 8 Chair Sit-to-Stands + 8 Wall Push-Ups + 8 Bean Can Curls",
+        description: "Finish strong on Christmas Eve by completing three rounds of these three moves back-to-back, resting briefly between rounds as needed.",
+        tip: "You've got this, Daleria—three festive rounds to celebrate Christmas Eve!"
+      }
+    ];
+
+    // Traditional Scrambled Advent Calendar Door Order (1–24)
+    const SCRAMBLED_ORDER = [
+      14, 3, 21, 8, 17, 1,
+      9, 24, 5, 19, 11, 6,
+      22, 12, 2, 16, 23, 7,
+      4, 18, 10, 20, 13, 15
+    ];
+
+    // Application State & LocalStorage Persistence
+    const STORAGE_KEY = "daleria_festive_advent_v1";
+    let state = loadState();
+    let previewMode = false;
+    let activeDay = null;
+    let snowEnabled = true;
+    let soundEnabled = true;
+    let toastTimeout = null;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          return {
+            opened: Array.isArray(parsed.opened) ? parsed.opened : [],
+            completed: Array.isArray(parsed.completed) ? parsed.completed : []
+          };
+        }
+      } catch (e) {
+        // Fallback if storage is restricted
+      }
+      return { opened: [], completed: [] };
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        // Ignore storage write errors in private contexts
+      }
+    }
+
+    // Shared Web Audio Context & "Carol of the Bells" Synthesizer
+    let audioCtx = null;
+    let musicIntervalId = null;
+    let musicStep = 0;
+
+    function ensureAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume().catch(() => {});
+      }
+      return audioCtx;
+    }
+
+    function playBellTone(freq, startTime, duration, volume = 0.08) {
+      const ctx = ensureAudioContext();
+      if (!ctx || !soundEnabled) return;
+
+      // Fundamental + metallic bell overtone
+      [1, 2].forEach((harmonic, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = idx === 0 ? "sine" : "triangle";
+        osc.frequency.setValueAtTime(freq * harmonic, startTime);
+
+        const peak = idx === 0 ? volume : volume * 0.28;
+        gain.gain.setValueAtTime(0.0001, startTime);
+        gain.gain.exponentialRampToValueAtTime(peak, startTime + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(startTime);
+        osc.stop(startTime + duration + 0.02);
+      });
+    }
+
+    // Iconic "Carol of the Bells" (Ukrainian Bell Carol) full rising melody & bassline
+    const CAROL_PHRASE = [
+      // Bars 1–2: Classic 4-note ostinato (Bb4 - A4 - Bb4 - G4) x 2
+      { freq: 466.16, dur: 0.30, delay: 300, bass: 196.00 }, // Bb4 + G3
+      { freq: 440.00, dur: 0.15, delay: 150 },               // A4
+      { freq: 466.16, dur: 0.15, delay: 150 },               // Bb4
+      { freq: 392.00, dur: 0.32, delay: 300 },               // G4
+
+      { freq: 466.16, dur: 0.30, delay: 300, bass: 174.61 }, // Bb4 + F3
+      { freq: 440.00, dur: 0.15, delay: 150 },               // A4
+      { freq: 466.16, dur: 0.15, delay: 150 },               // Bb4
+      { freq: 392.00, dur: 0.32, delay: 300 },               // G4
+
+      // Bars 3–4: Rising pitch motif (D5 - C5 - D5 - Bb4) x 2
+      { freq: 587.33, dur: 0.30, delay: 300, bass: 155.56 }, // D5 + Eb3
+      { freq: 523.25, dur: 0.15, delay: 150 },               // C5
+      { freq: 587.33, dur: 0.15, delay: 150 },               // D5
+      { freq: 466.16, dur: 0.32, delay: 300 },               // Bb4
+
+      { freq: 587.33, dur: 0.30, delay: 300, bass: 146.83 }, // D5 + D3
+      { freq: 523.25, dur: 0.15, delay: 150 },               // C5
+      { freq: 587.33, dur: 0.15, delay: 150 },               // D5
+      { freq: 466.16, dur: 0.32, delay: 300 },               // Bb4
+
+      // Bars 5–6: Higher soaring pitch motif (G5 - F5 - G5 - Eb5) x 2
+      { freq: 783.99, dur: 0.30, delay: 300, bass: 196.00 }, // G5 + G3
+      { freq: 698.46, dur: 0.15, delay: 150 },               // F5
+      { freq: 783.99, dur: 0.15, delay: 150 },               // G5
+      { freq: 622.25, dur: 0.32, delay: 300 },               // Eb5
+
+      { freq: 783.99, dur: 0.30, delay: 300, bass: 174.61 }, // G5 + F3
+      { freq: 698.46, dur: 0.15, delay: 150 },               // F5
+      { freq: 783.99, dur: 0.15, delay: 150 },               // G5
+      { freq: 622.25, dur: 0.32, delay: 300 },               // Eb5
+
+      // Bars 7–8: Cascading climax (D5 - C5 - D5 - Bb4 -> Bb4 - A4 - Bb4 - G4)
+      { freq: 587.33, dur: 0.30, delay: 300, bass: 155.56 }, // D5 + Eb3
+      { freq: 523.25, dur: 0.15, delay: 150 },               // C5
+      { freq: 587.33, dur: 0.15, delay: 150 },               // D5
+      { freq: 466.16, dur: 0.32, delay: 300 },               // Bb4
+
+      { freq: 466.16, dur: 0.30, delay: 300, bass: 146.83 }, // Bb4 + D3
+      { freq: 440.00, dur: 0.15, delay: 150 },               // A4
+      { freq: 466.16, dur: 0.15, delay: 150 },               // Bb4
+      { freq: 392.00, dur: 0.34, delay: 300 },               // G4
+
+      // Bars 9–10: Dramatic ascending scale climb ("Merry, Merry, Merry, Merry Christmas!")
+      { freq: 293.66, dur: 0.15, delay: 150, bass: 196.00 }, // D4 + G3
+      { freq: 329.63, dur: 0.15, delay: 150 },               // E4
+      { freq: 369.99, dur: 0.15, delay: 150 },               // F#4
+      { freq: 392.00, dur: 0.15, delay: 150 },               // G4
+      { freq: 440.00, dur: 0.15, delay: 150 },               // A4
+      { freq: 466.16, dur: 0.15, delay: 150 },               // Bb4
+
+      { freq: 523.25, dur: 0.15, delay: 150, bass: 146.83 }, // C5 + D3
+      { freq: 587.33, dur: 0.15, delay: 150 },               // D5
+      { freq: 523.25, dur: 0.30, delay: 300 },               // C5
+      { freq: 466.16, dur: 0.32, delay: 300 }                // Bb4
+    ];
+
+    function scheduleNextCarolNote() {
+      if (!soundEnabled) return;
+      const ctx = ensureAudioContext();
+      if (!ctx) return;
+
+      const idx = musicStep % CAROL_PHRASE.length;
+      const note = CAROL_PHRASE[idx];
+      const now = ctx.currentTime;
+
+      // Melody bell note
+      playBellTone(note.freq, now, note.dur * 1.45, 0.045);
+
+      // Descending bass bell on the start of each measure
+      if (note.bass) {
+        playBellTone(note.bass, now, 0.9, 0.032);
+      }
+
+      musicStep++;
+      musicIntervalId = setTimeout(scheduleNextCarolNote, note.delay);
+    }
+
+    function startBackingMusic() {
+      if (musicIntervalId || !soundEnabled) return;
+      ensureAudioContext();
+      scheduleNextCarolNote();
+    }
+
+    function stopBackingMusic() {
+      if (musicIntervalId) {
+        clearTimeout(musicIntervalId);
+        musicIntervalId = null;
+      }
+    }
+
+    function playDoorChime() {
+      const ctx = ensureAudioContext();
+      if (!ctx || !soundEnabled) return;
+      const now = ctx.currentTime;
+      // High-octave "Carol of the Bells" chime cascade
+      playBellTone(932.33, now, 0.35, 0.09);        // Bb5
+      playBellTone(880.00, now + 0.14, 0.25, 0.08); // A5
+      playBellTone(932.33, now + 0.26, 0.25, 0.08); // Bb5
+      playBellTone(783.99, now + 0.38, 0.55, 0.10); // G5
+    }
+
+    function playCompleteChime() {
+      const ctx = ensureAudioContext();
+      if (!ctx || !soundEnabled) return;
+      const now = ctx.currentTime;
+      playBellTone(783.99, now, 0.3, 0.09);         // G5
+      playBellTone(932.33, now + 0.14, 0.3, 0.09);  // Bb5
+      playBellTone(1174.66, now + 0.28, 0.7, 0.11); // D6
+    }
+
+    // Unlock audio cleanly on first interaction anywhere
+    document.addEventListener("pointerdown", () => {
+      ensureAudioContext();
+      if (soundEnabled && !musicIntervalId) {
+        startBackingMusic();
+      }
+    }, { once: true });
+
+    // DOM Element References
+    const doorsGrid = document.getElementById("doors-grid");
+    const progressLabel = document.getElementById("progress-label");
+    const calendarDateStatus = document.getElementById("calendar-date-status");
+    const previewModeBtn = document.getElementById("preview-mode-btn");
+    const previewIcon = document.getElementById("preview-icon");
+    const previewLabel = document.getElementById("preview-label");
+    const closeDoorsBtn = document.getElementById("close-doors-btn");
+    const toggleSnowBtn = document.getElementById("toggle-snow-btn");
+    const snowStatusText = document.getElementById("snow-status-text");
+    const toggleSoundBtn = document.getElementById("toggle-sound-btn");
+    const soundIcon = document.getElementById("sound-icon");
+    const soundStatusText = document.getElementById("sound-status-text");
+
+    const toastBanner = document.getElementById("toast-banner");
+    const toastIcon = document.getElementById("toast-icon");
+    const toastMessage = document.getElementById("toast-message");
+
+    const exerciseModal = document.getElementById("exercise-modal");
+    const closeModalBtn = document.getElementById("close-modal-btn");
+    const modalDoneBtn = document.getElementById("modal-done-btn");
+    const modalDateLabel = document.getElementById("modal-date-label");
+    const modalExerciseTitle = document.getElementById("modal-exercise-title");
+    const modalExerciseIcon = document.getElementById("modal-exercise-icon");
+    const modalExerciseReps = document.getElementById("modal-exercise-reps");
+    const modalExerciseDesc = document.getElementById("modal-exercise-desc");
+    const modalExerciseTip = document.getElementById("modal-exercise-tip");
+    const markCompleteBtn = document.getElementById("mark-complete-btn");
+    const completeBtnIcon = document.getElementById("complete-btn-icon");
+    const completeBtnText = document.getElementById("complete-btn-text");
+
+    // Date Locking Logic (December 1–24)
+    function isDoorUnlocked(day) {
+      if (previewMode) return true;
+      const now = new Date();
+      const month = now.getMonth(); // 11 = December
+      const date = now.getDate();
+      if (month === 11) {
+        return date >= day;
+      }
+      return false;
+    }
+
+    function isTodayDoor(day) {
+      const now = new Date();
+      return now.getMonth() === 11 && now.getDate() === day;
+    }
+
+    function updateHeaderDateStatus() {
+      if (previewMode) {
+        calendarDateStatus.textContent = "Creator Preview Mode • All Doors Unlocked";
+        return;
+      }
+      const now = new Date();
+      const month = now.getMonth();
+      const date = now.getDate();
+      if (month === 11 && date >= 1 && date <= 24) {
+        calendarDateStatus.textContent = `December ${date} • Door ${date} Unlocked!`;
+      } else if (month === 11 && date > 24) {
+        calendarDateStatus.textContent = "Merry Christmas! All 24 Doors Unlocked";
+      } else {
+        calendarDateStatus.textContent = "Unlocks December 1st";
+      }
+    }
+
+    function updateProgressUI() {
+      const doneCount = state.completed.length;
+      progressLabel.textContent = `${doneCount} / 24 Completed`;
+    }
+
+    function showToast(message, icon = "🔒") {
+      toastIcon.textContent = icon;
+      toastMessage.textContent = message;
+      toastBanner.classList.remove("opacity-0", "translate-y-3");
+      toastBanner.classList.add("opacity-100", "translate-y-0");
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toastBanner.classList.add("opacity-0", "translate-y-3");
+        toastBanner.classList.remove("opacity-100", "translate-y-0");
+      }, 2800);
+    }
+
+    // Render All 24 Scrambled Advent Doors
+    function renderDoors() {
+      doorsGrid.innerHTML = "";
+      const doorStyles = ["door-style-wood", "door-style-berry", "door-style-pine"];
+
+      SCRAMBLED_ORDER.forEach((day, index) => {
+        const exercise = EXERCISES.find((ex) => ex.day === day);
+        const unlocked = isDoorUnlocked(day);
+        const isOpen = state.opened.includes(day);
+        const isCompleted = state.completed.includes(day);
+        const isToday = isTodayDoor(day);
+
+        const slot = document.createElement("div");
+        slot.className = `door-slot ${isOpen ? "is-open" : ""} ${isToday ? "is-today" : ""}`;
+
+        // Inner glowing alcove revealed when door swings open
+        const alcove = document.createElement("button");
+        alcove.type = "button";
+        alcove.className = "door-alcove text-center";
+        alcove.setAttribute("aria-label", `View Day ${day}: ${exercise.title}`);
+        alcove.innerHTML = `
+          <span class="text-xl sm:text-2xl leading-none">${isCompleted ? "⭐" : exercise.icon}</span>
+          <span class="mt-1 text-[10px] sm:text-[11px] font-extrabold text-amber-950 leading-tight line-clamp-2 px-0.5">
+            Dec ${day}
+          </span>
+          <span class="text-[9px] font-bold uppercase tracking-wide ${isCompleted ? "text-emerald-900" : "text-red-900"}">
+            ${isCompleted ? "Done!" : "Open"}
+          </span>
+        `;
+        alcove.addEventListener("click", () => openExerciseModal(day));
+
+        // Hinged front door leaf
+        const styleClass = doorStyles[(day + index) % doorStyles.length];
+        const leaf = document.createElement("button");
+        leaf.type = "button";
+        leaf.className = `door-leaf ${styleClass} text-amber-100`;
+        leaf.setAttribute(
+          "aria-label",
+          unlocked ? `Open December ${day} door` : `December ${day} door (locked)`
+        );
+
+        leaf.innerHTML = `
+          <span class="font-festive text-lg sm:text-xl font-black text-amber-200 gold-text-shadow leading-none">
+            ${day}
+          </span>
+          <span class="mt-1 text-[11px] leading-none">
+            ${isCompleted ? "⭐" : unlocked ? "🎄" : "🔒"}
+          </span>
+          <span class="door-knob"></span>
+        `;
+
+        leaf.addEventListener("click", () => {
+          if (!unlocked) {
+            slot.classList.remove("shake-locked");
+            void slot.offsetWidth; // trigger reflow for repeat shake
+            slot.classList.add("shake-locked");
+            showToast(`No peeking! Door ${day} unlocks on December ${day}.`, "🔒");
+            return;
+          }
+
+          if (!state.opened.includes(day)) {
+            state.opened.push(day);
+            saveState();
+          }
+
+          slot.classList.add("is-open");
+          playDoorChime();
+
+          setTimeout(() => {
+            openExerciseModal(day);
+          }, 360);
+        });
+
+        slot.appendChild(alcove);
+        slot.appendChild(leaf);
+        doorsGrid.appendChild(slot);
+      });
+    }
+
+    // Modal Display & Mark Complete Logic
+    function openExerciseModal(day) {
+      const exercise = EXERCISES.find((ex) => ex.day === day);
+      if (!exercise) return;
+
+      activeDay = day;
+      modalDateLabel.textContent = `December ${day}`;
+      modalExerciseTitle.textContent = exercise.title;
+      modalExerciseIcon.textContent = exercise.icon;
+      modalExerciseReps.textContent = exercise.reps;
+      modalExerciseDesc.textContent = exercise.description;
+      modalExerciseTip.textContent = exercise.tip;
+
+      updateModalCompleteButton();
+      exerciseModal.classList.remove("hidden");
+      exerciseModal.classList.add("flex");
+    }
+
+    function closeExerciseModal() {
+      exerciseModal.classList.add("hidden");
+      exerciseModal.classList.remove("flex");
+      activeDay = null;
+    }
+
+    function updateModalCompleteButton() {
+      if (activeDay === null) return;
+      const done = state.completed.includes(activeDay);
+      if (done) {
+        markCompleteBtn.className =
+          "flex-1 py-3 px-4 rounded-xl font-bold text-sm sm:text-base shadow-md transition active:scale-98 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-amber-950";
+        completeBtnIcon.textContent = "✅";
+        completeBtnText.textContent = "Completed! (Tap to Undo)";
+      } else {
+        markCompleteBtn.className =
+          "flex-1 py-3 px-4 rounded-xl font-bold text-sm sm:text-base shadow-md transition active:scale-98 flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white";
+        completeBtnIcon.textContent = "⭐";
+        completeBtnText.textContent = "Mark Complete";
+      }
+    }
+
+    markCompleteBtn.addEventListener("click", () => {
+      if (activeDay === null) return;
+      const idx = state.completed.indexOf(activeDay);
+      if (idx === -1) {
+        state.completed.push(activeDay);
+        playCompleteChime();
+        showToast(`Amazing job, Daleria! Day ${activeDay} marked complete!`, "⭐");
+      } else {
+        state.completed.splice(idx, 1);
+      }
+      saveState();
+      updateProgressUI();
+      updateModalCompleteButton();
+      renderDoors();
+    });
+
+    closeModalBtn.addEventListener("click", closeExerciseModal);
+    modalDoneBtn.addEventListener("click", closeExerciseModal);
+    exerciseModal.addEventListener("click", (e) => {
+      if (e.target === exerciseModal) closeExerciseModal();
+    });
+
+    // Discreet Creator Preview Mode Toggle
+    previewModeBtn.addEventListener("click", () => {
+      previewMode = !previewMode;
+      previewIcon.textContent = previewMode ? "🔓" : "🔑";
+      previewLabel.textContent = previewMode ? "Preview Mode: ON" : "Preview Mode: Off";
+      updateHeaderDateStatus();
+      renderDoors();
+      showToast(
+        previewMode
+          ? "Preview Mode ON: All 24 doors unlocked for testing."
+          : "Preview Mode OFF: Doors locked by real calendar date.",
+        previewMode ? "🔓" : "🔒"
+      );
+    });
+
+    // Close Opened Doors & Reset Test Progress
+    closeDoorsBtn.addEventListener("click", () => {
+      state.opened = [];
+      state.completed = [];
+      saveState();
+      updateProgressUI();
+      renderDoors();
+      showToast("All doors closed and test progress cleared!", "🚪");
+    });
+
+    // Sound / Backing Music Toggle
+    toggleSoundBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      soundEnabled = !soundEnabled;
+      soundIcon.textContent = soundEnabled ? "🎵" : "🔇";
+      soundStatusText.textContent = soundEnabled ? "Music On" : "Muted";
+      if (soundEnabled) {
+        startBackingMusic();
+      } else {
+        stopBackingMusic();
+      }
+    });
+
+    // Gentle Snowfall Canvas Animation
+    const canvas = document.getElementById("snow-canvas");
+    const ctx = canvas.getContext("2d");
+    let snowflakes = [];
+    let snowAnimId = null;
+
+    function resizeSnowCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initSnowflakes() {
+      const count = Math.min(75, Math.floor(window.innerWidth / 12));
+      snowflakes = Array.from({ length: count }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2.6 + 1,
+        speedY: Math.random() * 0.85 + 0.35,
+        speedX: Math.random() * 0.5 - 0.25,
+        opacity: Math.random() * 0.65 + 0.25
+      }));
+    }
+
+    function drawSnow() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!snowEnabled) return;
+
+      snowflakes.forEach((flake) => {
+        ctx.beginPath();
+        ctx.arc(flake.x, flake.y, flake.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${flake.opacity})`;
+        ctx.fill();
+
+        flake.y += flake.speedY;
+        flake.x += flake.speedX + Math.sin(flake.y * 0.015) * 0.25;
+
+        if (flake.y > canvas.height) {
+          flake.y = -5;
+          flake.x = Math.random() * canvas.width;
+        }
+        if (flake.x > canvas.width) flake.x = 0;
+        if (flake.x < 0) flake.x = canvas.width;
+      });
+
+      snowAnimId = requestAnimationFrame(drawSnow);
+    }
+
+    toggleSnowBtn.addEventListener("click", () => {
+      snowEnabled = !snowEnabled;
+      snowStatusText.textContent = snowEnabled ? "Snow On" : "Snow Off";
+      if (snowEnabled) {
+        drawSnow();
+      } else {
+        cancelAnimationFrame(snowAnimId);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      resizeSnowCanvas();
+      initSnowflakes();
+    });
+
+    // Initialize App on Load
+    window.onload = function () {
+      resizeSnowCanvas();
+      initSnowflakes();
+      drawSnow();
+      updateHeaderDateStatus();
+      updateProgressUI();
+      renderDoors();
+    };
+  </script>
+</body>
+</html>
